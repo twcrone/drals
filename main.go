@@ -4,39 +4,63 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"sort"
+	"strings"
 )
 
-type alias struct {
-	Key     string
-	Command string
+type DirAlias struct {
+	Alias   string
+	Dir     string
 }
 
 func main() {
 	file, _ := os.Open("/Users/twcrone/.drals")
 	scanner := bufio.NewScanner(file)
 	scanner.Split(bufio.ScanLines)
-	var text []string
-
+	dirAliasMap := make(map[string]DirAlias)
 	for scanner.Scan() {
-		text = append(text, scanner.Text())
+		var dirAlias = parse(scanner.Text())
+		dirAliasMap[dirAlias.Alias] = dirAlias
 	}
 
-	// The method os.File.Close() is called
-	// on the os.File object to close the file
 	file.Close()
 
-	// and then a loop iterates through
-	// and prints each of the slice values.
-	for _, eachLine := range text {
-		a := parse(eachLine)
-		fmt.Println(a)
+	list := listFrom(dirAliasMap)
+	sort.Sort(byAlias(list))
+
+	for _, dirAlias := range list {
+		fmt.Println(dirAlias.Alias, "->", dirAlias.Dir)
 	}
 }
 
-func parse(line string) alias {
-	alias := alias{Key: "key", Command: "command"}
+type byAlias []DirAlias
 
-	return alias
+func (a byAlias) Len() int {
+	return len(a)
+}
+
+func (a byAlias) Swap(i, j int) {
+	a[i], a[j] = a[j], a[i]
+}
+
+func (a byAlias) Less(i, j int) bool {
+	return a[i].Alias < a[j].Alias
+}
+
+func listFrom(dirAliasMap map[string]DirAlias) []DirAlias {
+	values := make([]DirAlias, 0, len(dirAliasMap))
+
+	for _, v := range dirAliasMap {
+		values = append(values, v)
+	}
+
+	return values
+}
+
+func parse(line string) DirAlias {
+	segments := strings.Split(line, "=")
+	alias := segments[0][6:]
+	return DirAlias{Alias: alias, Dir: segments[1]}
 }
 
 func list() {
