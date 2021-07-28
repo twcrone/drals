@@ -3,6 +3,8 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"io/ioutil"
+	"log"
 	"os"
 	"sort"
 	"strings"
@@ -14,7 +16,8 @@ type DirAlias struct {
 }
 
 func main() {
-	file, _ := os.Open("/Users/twcrone/.drals")
+	filename := "/Users/twcrone/.drals"
+	file, _ := os.Open(filename)
 	scanner := bufio.NewScanner(file)
 	scanner.Split(bufio.ScanLines)
 	dirAliasMap := make(map[string]DirAlias)
@@ -23,13 +26,41 @@ func main() {
 		dirAliasMap[dirAlias.Alias] = dirAlias
 	}
 
+	args := os.Args
+	if len(args) > 1 {
+		path, err := os.Getwd()
+		if err != nil {
+			log.Println(err)
+			return
+		}
+		alias := args[1]
+		dir := fmt.Sprintf("'%s'", path)
+		dirAlias := DirAlias{Alias: alias, Dir: dir}
+		dirAliasMap[alias] = dirAlias
+
+		list := listFrom(dirAliasMap)
+		sort.Sort(byAlias(list))
+
+		file, err = os.OpenFile(filename, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0755)
+		check(err)
+		datawriter := bufio.NewWriter(file)
+		for _, dirAlias := range list {
+			alias := fmt.Sprintf("alias %s=%s\n", dirAlias.Alias, dirAlias.Dir)
+			_, err := datawriter.WriteString(alias)
+			fmt.Println("Writing", alias)
+			check(err)
+		}
+		datawriter.Flush()
+	}
 	file.Close()
 
-	list := listFrom(dirAliasMap)
-	sort.Sort(byAlias(list))
+	dat, _ := ioutil.ReadFile(filename)
+	fmt.Println(string(dat))
+}
 
-	for _, dirAlias := range list {
-		fmt.Println(dirAlias.Alias, "->", dirAlias.Dir)
+func check(e error) {
+	if e != nil {
+		panic(e)
 	}
 }
 
@@ -61,12 +92,4 @@ func parse(line string) DirAlias {
 	segments := strings.Split(line, "=")
 	alias := segments[0][6:]
 	return DirAlias{Alias: alias, Dir: segments[1]}
-}
-
-func list() {
-
-}
-
-func add(directory string) {
-
 }
