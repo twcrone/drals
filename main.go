@@ -16,7 +16,8 @@ type DirAlias struct {
 }
 
 func main() {
-	filename := "/Users/twcrone/.drals"
+	homeDir, _ := os.UserHomeDir()
+	filename := homeDir + "/.drals"
 	file, _ := os.Open(filename)
 	scanner := bufio.NewScanner(file)
 	scanner.Split(bufio.ScanLines)
