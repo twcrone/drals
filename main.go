@@ -43,18 +43,23 @@ func main() {
 
 		file, err = os.OpenFile(filename, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0755)
 		check(err)
-		datawriter := bufio.NewWriter(file)
+		writer := bufio.NewWriter(file)
 		for _, dirAlias := range list {
 			alias := fmt.Sprintf("alias %s=%s\n", dirAlias.Alias, dirAlias.Dir)
-			_, err := datawriter.WriteString(alias)
-			fmt.Println("Writing", alias)
+			_, err := writer.WriteString(alias)
+			fmt.Print("Writing ", alias)
 			check(err)
 		}
-		datawriter.Flush()
+		err = writer.Flush()
+		check(err)
 	}
-	file.Close()
+	err := file.Close()
+	check(err)
 
 	dat, _ := ioutil.ReadFile(filename)
+	fmt.Println()
+	fmt.Println("Current list of directory aliases")
+	fmt.Println("---------------------------------")
 	fmt.Println(string(dat))
 }
 
