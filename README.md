@@ -4,15 +4,15 @@ Directory Aliases
 Simple command line utility for maintaining an alias file that can
 be sourced for directory aliases for jumping around file system easily.
 
-# Install
+### Install
 
 `go install`
 
-# List directory aliases
+### List directory aliases
 
 `drals`
 
-# Add a directory alias (applies to curent directory)
+### Add a directory alias (applies to curent directory)
 
 `drals <alias-name>`
 
