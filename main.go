@@ -7,12 +7,12 @@ import (
 )
 
 type alias struct {
-	Name    string
-	Value   string
+	Key     string
+	Command string
 }
 
 func main() {
-	file, _ := os.Open("/Users/twcrone/.aliasdb")
+	file, _ := os.Open("/Users/twcrone/.drals")
 	scanner := bufio.NewScanner(file)
 	scanner.Split(bufio.ScanLines)
 	var text []string
@@ -34,7 +34,7 @@ func main() {
 }
 
 func parse(line string) alias {
-	alias := alias{Name: "name", Value: "value"}
+	alias := alias{Key: "key", Command: "command"}
 
 	return alias
 }

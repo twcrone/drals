@@ -1,3 +1,3 @@
-module github.com/twcrone/aliasdb
+module github.com/twcrone/drals
 
 go 1.14
